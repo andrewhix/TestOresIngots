@@ -184,11 +184,11 @@ public class Item
 
 	private static readonly List<Item> registeredItems = new();
 	private static readonly Dictionary<ItemDrop, Item> itemDropMap = new();
-	private static Dictionary<Item, Dictionary<string, List<Recipe>>> activeRecipes = new();
-	private static Dictionary<Recipe, ConfigEntryBase?> hiddenCraftRecipes = new();
-	private static Dictionary<Recipe, ConfigEntryBase?> hiddenUpgradeRecipes = new();
-	private static Dictionary<Item, Dictionary<string, ItemConfig>> itemCraftConfigs = new();
-	private static Dictionary<Item, ConfigEntry<string>> itemDropConfigs = new();
+	private static readonly Dictionary<Item, Dictionary<string, List<Recipe>>> activeRecipes = new();
+	private static readonly Dictionary<Recipe, ConfigEntryBase?> hiddenCraftRecipes = new();
+	private static readonly Dictionary<Recipe, ConfigEntryBase?> hiddenUpgradeRecipes = new();
+	private static readonly Dictionary<Item, Dictionary<string, ItemConfig>> itemCraftConfigs = new();
+	private static readonly Dictionary<Item, ConfigEntry<string>> itemDropConfigs = new();
 	private Dictionary<CharacterDrop, CharacterDrop.Drop> characterDrops = new();
 	private readonly Dictionary<ConfigEntryBase, Action> statsConfigs = new();
 	private static readonly ConditionalWeakTable<Piece.Requirement, RequirementQuality> requirementQuality = new();
@@ -473,7 +473,7 @@ public class Item
 
 				if ((item.configurability & Configurability.Recipe) != 0)
 				{
-					itemCraftConfigs[item] = new Dictionary<string, ItemConfig>();
+					itemCraftConfigs[item] = new();
 					foreach (string configKey in item.Recipes.Keys.DefaultIfEmpty(""))
 					{
 						string configSuffix = configKey == "" ? "" : $" ({configKey})";
@@ -484,10 +484,10 @@ public class Item
 
 							List<ConfigurationManagerAttributes> hideWhenNoneAttributes = new();
 
-							cfg.table = config(englishName, "Crafting Station" + configSuffix, item.Recipes[configKey].Crafting.Stations.First().Table, new ConfigDescription($"Crafting station where {englishName} is available.", null, new ConfigurationManagerAttributes { Order = --order, Browsable = (item.configurationVisible & Configurability.Recipe) != 0, Category = localizedName }));
+							cfg.table = Config(englishName, "Crafting Station" + configSuffix, item.Recipes[configKey].Crafting.Stations.First().Table, new ConfigDescription($"Crafting station where {englishName} is available.", null, new ConfigurationManagerAttributes { Order = --order, Browsable = (item.configurationVisible & Configurability.Recipe) != 0, Category = localizedName }));
 							bool CustomTableBrowsability() => cfg.table.Value == CraftingTable.Custom;
 							ConfigurationManagerAttributes customTableAttributes = new() { Order = --order, browsability = CustomTableBrowsability, Browsable = CustomTableBrowsability() && (item.configurationVisible & Configurability.Recipe) != 0, Category = localizedName };
-							cfg.customTable = config(englishName, "Custom Crafting Station" + configSuffix, item.Recipes[configKey].Crafting.Stations.First().custom ?? "", new ConfigDescription("", null, customTableAttributes));
+							cfg.customTable = Config(englishName, "Custom Crafting Station" + configSuffix, item.Recipes[configKey].Crafting.Stations.First().custom ?? "", new ConfigDescription("", null, customTableAttributes));
 
 							void TableConfigChanged(object o, EventArgs e)
 							{
@@ -505,7 +505,7 @@ public class Item
 							bool TableLevelBrowsability() => cfg.table.Value != CraftingTable.Disabled;
 							ConfigurationManagerAttributes tableLevelAttributes = new() { Order = --order, browsability = TableLevelBrowsability, Browsable = TableLevelBrowsability() && (item.configurationVisible & Configurability.Recipe) != 0, Category = localizedName };
 							hideWhenNoneAttributes.Add(tableLevelAttributes);
-							cfg.tableLevel = config(englishName, "Crafting Station Level" + configSuffix, item.Recipes[configKey].Crafting.Stations.First().level, new ConfigDescription($"Required crafting station level to craft {englishName}.", null, tableLevelAttributes));
+							cfg.tableLevel = Config(englishName, "Crafting Station Level" + configSuffix, item.Recipes[configKey].Crafting.Stations.First().level, new ConfigDescription($"Required crafting station level to craft {englishName}.", null, tableLevelAttributes));
 							cfg.tableLevel.SettingChanged += (_, _) =>
 							{
 								if (activeRecipes.ContainsKey(item) && activeRecipes[item].TryGetValue(configKey, out List<Recipe> recipes))
@@ -515,11 +515,11 @@ public class Item
 							};
 							if (item.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_maxQuality > 1)
 							{
-								cfg.maximumTableLevel = config(englishName, "Maximum Crafting Station Level" + configSuffix, item.MaximumRequiredStationLevel == int.MaxValue ? item.Recipes[configKey].Crafting.Stations.First().level + item.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_maxQuality - 1 : item.MaximumRequiredStationLevel, new ConfigDescription($"Maximum crafting station level to upgrade and repair {englishName}.", null, tableLevelAttributes));
+								cfg.maximumTableLevel = Config(englishName, "Maximum Crafting Station Level" + configSuffix, item.MaximumRequiredStationLevel == int.MaxValue ? item.Recipes[configKey].Crafting.Stations.First().level + item.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_maxQuality - 1 : item.MaximumRequiredStationLevel, new ConfigDescription($"Maximum crafting station level to upgrade and repair {englishName}.", null, tableLevelAttributes));
 							}
 
 							bool QualityResultBrowsability() => cfg.requireOneIngredient.Value == Toggle.On;
-							cfg.requireOneIngredient = config(englishName, "Require only one resource" + configSuffix, item.Recipes[configKey].RequireOnlyOneIngredient ? Toggle.On : Toggle.Off, new ConfigDescription($"Whether only one of the ingredients is needed to craft {englishName}", null, new ConfigurationManagerAttributes { Order = --order, Category = localizedName }));
+							cfg.requireOneIngredient = Config(englishName, "Require only one resource" + configSuffix, item.Recipes[configKey].RequireOnlyOneIngredient ? Toggle.On : Toggle.Off, new ConfigDescription($"Whether only one of the ingredients is needed to craft {englishName}", null, new ConfigurationManagerAttributes { Order = --order, Category = localizedName }));
 							ConfigurationManagerAttributes qualityResultAttributes = new() { Order = --order, browsability = QualityResultBrowsability, Browsable = QualityResultBrowsability() && (item.configurationVisible & Configurability.Recipe) != 0, Category = localizedName };
 							cfg.requireOneIngredient.SettingChanged += (_, _) =>
 							{
@@ -533,7 +533,7 @@ public class Item
 								qualityResultAttributes.Browsable = QualityResultBrowsability();
 								reloadConfigDisplay();
 							};
-							cfg.qualityResultAmountMultiplier = config(englishName, "Quality Multiplier" + configSuffix, item.Recipes[configKey].QualityResultAmountMultiplier, new ConfigDescription($"Multiplies the crafted amount based on the quality of the resources when crafting {englishName}. Only works, if Require Only One Resource is true.", null, qualityResultAttributes));
+							cfg.qualityResultAmountMultiplier = Config(englishName, "Quality Multiplier" + configSuffix, item.Recipes[configKey].QualityResultAmountMultiplier, new ConfigDescription($"Multiplies the crafted amount based on the quality of the resources when crafting {englishName}. Only works, if Require Only One Resource is true.", null, qualityResultAttributes));
 							cfg.qualityResultAmountMultiplier.SettingChanged += (_, _) =>
 							{
 								if (activeRecipes.ContainsKey(item) && activeRecipes[item].TryGetValue(configKey, out List<Recipe> recipes))
@@ -550,7 +550,7 @@ public class Item
 								bool ItemBrowsability() => cfg.table.Value != CraftingTable.Disabled;
 								ConfigurationManagerAttributes attributes = new() { CustomDrawer = drawRequirementsConfigTable(item, isUpgrade), Order = --order, browsability = ItemBrowsability, Browsable = ItemBrowsability() && (item.configurationVisible & Configurability.Recipe) != 0, Category = localizedName };
 								hideWhenNoneAttributes.Add(attributes);
-								return config(englishName, name, value, new ConfigDescription(desc, null, attributes));
+								return Config(englishName, name, value, new ConfigDescription(desc, null, attributes));
 							}
 
 							if ((!item.Recipes[configKey].RequiredItems.Free || item.Recipes[configKey].RequiredItems.Requirements.Count > 0) && item.Recipes[configKey].RequiredItems.Requirements.All(r => r.amountConfig is null))
@@ -580,7 +580,7 @@ public class Item
 
 					if ((item.configurability & Configurability.Drop) != 0)
 					{
-						ConfigEntry<string> dropConfig = itemDropConfigs[item] = config(englishName, "Drops from", new SerializedDrop(item.DropsFrom.Drops).ToString(), new ConfigDescription($"{englishName} drops from this creature.", null, new ConfigurationManagerAttributes { CustomDrawer = drawDropsConfigTable, Category = localizedName, Browsable = (item.configurationVisible & Configurability.Drop) != 0 }));
+						ConfigEntry<string> dropConfig = itemDropConfigs[item] = Config(englishName, "Drops from", new SerializedDrop(item.DropsFrom.Drops).ToString(), new ConfigDescription($"{englishName} drops from this creature.", null, new ConfigurationManagerAttributes { CustomDrawer = drawDropsConfigTable, Category = localizedName, Browsable = (item.configurationVisible & Configurability.Drop) != 0 }));
 						dropConfig.SettingChanged += (_, _) => item.UpdateCharacterDrop();
 					}
 
@@ -631,7 +631,7 @@ public class Item
 							}
 						}
 
-						conversion.config.input = config(englishName, $"{prefix}Conversion Input Item", conversion.Input, new ConfigDescription($"Input item to create {englishName}", null, new ConfigurationManagerAttributes { Category = localizedName, Browsable = (item.configurationVisible & Configurability.Recipe) != 0 }));
+						conversion.config.input = Config(englishName, $"{prefix}Conversion Input Item", conversion.Input, new ConfigDescription($"Input item to create {englishName}", null, new ConfigurationManagerAttributes { Category = localizedName, Browsable = (item.configurationVisible & Configurability.Recipe) != 0 }));
 						conversion.config.input.SettingChanged += (_, _) =>
 						{
 							if (index < item.conversions.Count && ObjectDB.instance is { } objectDB)
@@ -641,9 +641,9 @@ public class Item
 								UpdatePiece();
 							}
 						};
-						conversion.config.piece = config(englishName, $"{prefix}Conversion Piece", conversion.Piece, new ConfigDescription($"Conversion piece used to create {englishName}", null, new ConfigurationManagerAttributes { Category = localizedName, Browsable = (item.configurationVisible & Configurability.Recipe) != 0 }));
+						conversion.config.piece = Config(englishName, $"{prefix}Conversion Piece", conversion.Piece, new ConfigDescription($"Conversion piece used to create {englishName}", null, new ConfigurationManagerAttributes { Category = localizedName, Browsable = (item.configurationVisible & Configurability.Recipe) != 0 }));
 						conversion.config.piece.SettingChanged += (_, _) => UpdatePiece();
-						conversion.config.customPiece = config(englishName, $"{prefix}Conversion Custom Piece", conversion.customPiece ?? "", new ConfigDescription($"Custom conversion piece to create {englishName}", null, new ConfigurationManagerAttributes { Category = localizedName, Browsable = (item.configurationVisible & Configurability.Recipe) != 0 }));
+						conversion.config.customPiece = Config(englishName, $"{prefix}Conversion Custom Piece", conversion.customPiece ?? "", new ConfigDescription($"Custom conversion piece to create {englishName}", null, new ConfigurationManagerAttributes { Category = localizedName, Browsable = (item.configurationVisible & Configurability.Recipe) != 0 }));
 						conversion.config.customPiece.SettingChanged += (_, _) => UpdatePiece();
 					}
 				}
@@ -654,7 +654,7 @@ public class Item
 					void statcfg<T>(string configName, string description, Func<ItemDrop.ItemData.SharedData, T> readDefault, Action<ItemDrop.ItemData.SharedData, T> setValue)
 					{
 						ItemDrop.ItemData.SharedData shared = item.Prefab.GetComponent<ItemDrop>().m_itemData.m_shared;
-						ConfigEntry<T> cfg = config(englishName, configName, readDefault(shared), new ConfigDescription(description, null, new ConfigurationManagerAttributes { Category = localizedName, Browsable = (item.configurationVisible & Configurability.Stats) != 0 }));
+						ConfigEntry<T> cfg = Config(englishName, configName, readDefault(shared), new ConfigDescription(description, null, new ConfigurationManagerAttributes { Category = localizedName, Browsable = (item.configurationVisible & Configurability.Stats) != 0 }));
 						if ((item.configurationVisible & Configurability.Stats) != 0)
 						{
 							setValue(shared, cfg.Value);
@@ -801,7 +801,7 @@ public class Item
 
 					item.traderConfig = new TraderConfig
 					{
-						trader = config(englishName, "Trader Selling", item.Trade.Trader, new ConfigDescription($"Which traders sell {englishName}.", null, new ConfigurationManagerAttributes { Order = --order, Browsable = (item.configurationVisible & Configurability.Trader) != 0, Category = localizedName })),
+						trader = Config(englishName, "Trader Selling", item.Trade.Trader, new ConfigDescription($"Which traders sell {englishName}.", null, new ConfigurationManagerAttributes { Order = --order, Browsable = (item.configurationVisible & Configurability.Trader) != 0, Category = localizedName })),
 					};
 					item.traderConfig.trader.SettingChanged += (_, _) =>
 					{
@@ -817,7 +817,7 @@ public class Item
 					{
 						ConfigurationManagerAttributes attributes = new() { Order = --order, browsability = TraderBrowsability, Browsable = TraderBrowsability() && (item.configurationVisible & Configurability.Trader) != 0, Category = localizedName };
 						traderAttributes.Add(attributes);
-						ConfigEntry<T> cfg = config(englishName, name, value, new ConfigDescription(desc, null, attributes));
+						ConfigEntry<T> cfg = Config(englishName, name, value, new ConfigDescription(desc, null, attributes));
 						cfg.SettingChanged += (_, _) => item.ReloadTraderConfiguration();
 						return cfg;
 					}
@@ -955,7 +955,7 @@ public class Item
 
 	private void registerRecipesInObjectDB(ObjectDB objectDB)
 	{
-		activeRecipes[this] = new Dictionary<string, List<Recipe>>();
+		activeRecipes[this] = new();
 
 		itemCraftConfigs.TryGetValue(this, out Dictionary<string, ItemConfig> cfgs);
 		foreach (KeyValuePair<string, ItemRecipe> kv in Recipes)
@@ -1105,7 +1105,7 @@ public class Item
 
 	internal static void Patch_GetAvailableRecipesPrefix(ref Dictionary<Assembly, Dictionary<Recipe, ConfigEntryBase?>>? __state)
 	{
-		__state ??= new Dictionary<Assembly, Dictionary<Recipe, ConfigEntryBase?>>();
+		__state ??= new();
 		Dictionary<Recipe, ConfigEntryBase?>? hidden;
 		if (InventoryGui.instance.InCraftTab())
 		{
@@ -1763,7 +1763,7 @@ public class Item
 	private static bool hasConfigSync = true;
 	private static object? _configSync;
 
-	private static object? configSync
+	private static object? ConfigSync
 	{
 		get
 		{
@@ -1785,16 +1785,16 @@ public class Item
 		}
 	}
 
-	private static ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description)
+	private static ConfigEntry<T> Config<T>(string group, string name, T value, ConfigDescription description)
 	{
 		ConfigEntry<T> configEntry = plugin.Config.Bind(group, name, value, description);
 
-		configSync?.GetType().GetMethod("AddConfigEntry")!.MakeGenericMethod(typeof(T)).Invoke(configSync, new object[] { configEntry });
+		ConfigSync?.GetType().GetMethod("AddConfigEntry")!.MakeGenericMethod(typeof(T)).Invoke(ConfigSync, new object[] { configEntry });
 
 		return configEntry;
 	}
 
-	private static ConfigEntry<T> config<T>(string group, string name, T value, string description) => config(group, name, value, new ConfigDescription(description));
+	private static ConfigEntry<T> Config<T>(string group, string name, T value, string description) => Config(group, name, value, new ConfigDescription(description));
 }
 
 [PublicAPI]
@@ -1988,7 +1988,7 @@ public static class PrefabManager
 
 	public static void AddItemToTrader(GameObject prefab, Trader trader, uint price, uint stack = 1, string? requiredGlobalKey = null)
 	{
-		CustomTradeItems[prefab] = new Tuple<Trader, global::Trader.TradeItem>(trader, new global::Trader.TradeItem
+		CustomTradeItems[prefab] = new(trader, new global::Trader.TradeItem
 		{
 			m_prefab = prefab.GetComponent<ItemDrop>(),
 			m_price = (int)price,
