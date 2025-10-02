@@ -44,10 +44,7 @@ namespace TestOresIngots
         {
             _serverConfigLocked = config("1 - General", "Lock Configuration", Toggle.On, "If on, the configuration is locked and can be changed by server admins only.");
             _ = ConfigSync.AddLockingConfigEntry(_serverConfigLocked);
-            
-
-
-
+            GameObject shadowRockPrefab = PrefabManager.RegisterPrefab("uooresingots", "UOminerock_shadow");
             Item UOshadow_ore = new Item("uooresingots", "UOshadow_ore");
             UOshadow_ore.Name.English("Shadow Ore");
             UOshadow_ore.Description.English("A chunk of shadow ore, pulsating with dark energy.");
@@ -57,12 +54,15 @@ namespace TestOresIngots
             UOshadow_ingot.Description.English("An ingot of shadow metal, radiating a faint dark aura.");
             UOshadow_ingot.Snapshot(); // I don't have an icon for this item in my asset bundle, so I will let the ItemManager generate one automatically
 
+            CustomMineRockRegistry.Register(shadowRockPrefab.name, "UOshadow_ore", 0.75f, 1, 4, 2);
+
             _ = new Conversion(UOshadow_ingot)
             {
                 Input = "UOshadow_ore",
                 Piece = ConversionPiece.Smelter
             };
 
+            GameObject agapiteRockPrefab = PrefabManager.RegisterPrefab("uooresingots", "UOminerock_agapite");
             Item UOagapite_ore = new Item("uooresingots", "UOagapite_ore");
             UOagapite_ore.Name.English("Agapite Ore");
             UOagapite_ore.Description.English("A chunk of agapite ore, shimmering with a silvery-blue hue.");
@@ -71,12 +71,15 @@ namespace TestOresIngots
             UOagapite_ingot.Name.English("Agapite Ingot");
             UOagapite_ingot.Description.English("An ingot of agapite metal, gleaming with a silvery-blue sheen.");
             UOagapite_ingot.Snapshot(); // I don't have an icon for this item in my asset bundle, so I will let the ItemManager generate one automatically
+            CustomMineRockRegistry.Register(agapiteRockPrefab.name, "UOagapite_ore", 0.6f, 1, 3, 2);
+
             _ = new Conversion(UOagapite_ingot)
             {
                 Input = "UOagapite_ore",
                 Piece = ConversionPiece.Smelter
             };
 
+            GameObject goldRockPrefab = PrefabManager.RegisterPrefab("uooresingots", "UOminerock_gold");
             Item UOgold_ore = new Item("uooresingots", "UOgold_ore");
             UOgold_ore.Name.English("Gold Ore");
             UOgold_ore.Description.English("A chunk of gold ore, glittering with a rich golden color.");
@@ -86,12 +89,15 @@ namespace TestOresIngots
             UOgold_ingot.Description.English("An ingot of pure gold, shining with a brilliant luster.");
             UOgold_ingot.Snapshot(); // I don't have an icon for this item in my asset bundle, so I will let the ItemManager generate one automatically
 
+            CustomMineRockRegistry.Register(goldRockPrefab.name, "UOgold_ore", 0.5f, 1, 2, 1);
+
             _ = new Conversion(UOgold_ingot)
             {
                 Input = "UOgold_ore",
                 Piece = ConversionPiece.Smelter
             };
 
+            GameObject veriteRockPrefab = PrefabManager.RegisterPrefab("uooresingots", "UOminerock_verite");
             Item UOverite_ore = new Item("uooresingots", "UOverite_ore");
             UOverite_ore.Name.English("Verite Ore");
             UOverite_ore.Description.English("A chunk of Verite ore, glowing with a mystical light.");
@@ -101,12 +107,15 @@ namespace TestOresIngots
             UOverite_ingot.Description.English("An ingot of Verite metal, pulsating with a mystical energy.");
             UOverite_ingot.Snapshot(); // I don't have an icon for this item in my asset bundle, so I will let the ItemManager generate one automatically
 
+            CustomMineRockRegistry.Register(veriteRockPrefab.name, "UOverite_ore", 0.65f, 1, 4, 2);
+
             _ = new Conversion(UOverite_ingot)
             {
                 Input = "UOverite_ore",
                 Piece = ConversionPiece.Smelter
             };
 
+            GameObject bloodrockPrefab = PrefabManager.RegisterPrefab("uooresingots", "UOminerock_bloodrock");
             Item UObloodrock_ore = new Item("uooresingots", "UObloodrock_ore");
             UObloodrock_ore.Name.English("Bloodrock Ore");
             UObloodrock_ore.Description.English("A chunk of bloodrock ore, radiating a deep red glow.");
@@ -116,12 +125,15 @@ namespace TestOresIngots
             UObloodrock_ingot.Description.English("An ingot of bloodrock metal, emanating a powerful red aura.");
             UObloodrock_ingot.Snapshot(); // I don't have an icon for this item in my asset bundle, so I will let the ItemManager generate one automatically
 
+            CustomMineRockRegistry.Register(bloodrockPrefab.name, "UObloodrock_ore", 0.7f, 1, 3, 2);
+
             _ = new Conversion(UObloodrock_ingot)
             {
                 Input = "UObloodrock_ore",
                 Piece = ConversionPiece.Smelter
             };
 
+            GameObject blackrockPrefab = PrefabManager.RegisterPrefab("uooresingots", "UOminerock_blackrock");
             Item UOblackrock_ore = new Item("uooresingots", "UOblackrock_ore");
             UOblackrock_ore.Name.English("Blackrock Ore");
             UOblackrock_ore.Description.English("A chunk of blackrock ore, absorbing light around it.");
@@ -131,12 +143,15 @@ namespace TestOresIngots
             UOblackrock_ingot.Description.English("An ingot of blackrock metal, exuding a dark and mysterious aura.");
             UOblackrock_ingot.Snapshot(); // I don't have an icon for this item in my asset bundle, so I will let the ItemManager generate one automatically
 
+            CustomMineRockRegistry.Register(blackrockPrefab.name, "UOblackrock_ore", 0.55f, 1, 3, 2);
+
             _ = new Conversion(UOblackrock_ingot)
             {
                 Input = "UOblackrock_ore",
                 Piece = ConversionPiece.Smelter
             };
 
+            GameObject snowRockPrefab = PrefabManager.RegisterPrefab("uooresingots", "UOminerock_snow");
             Item UOsnow_ore = new Item("uooresingots", "UOsnow_ore");
             UOsnow_ore.Name.English("Snow Ore");
             UOsnow_ore.Description.English("A chunk of snow ore, cold to the touch and shimmering with icy crystals.");
@@ -146,12 +161,15 @@ namespace TestOresIngots
             UOsnow_ingot.Description.English("An ingot of snow metal, radiating a chilling coldness.");
             UOsnow_ingot.Snapshot(); // I don't have an icon for this item in my asset bundle, so I will let the ItemManager generate one automatically
 
+            CustomMineRockRegistry.Register(snowRockPrefab.name, "UOsnow_ore", 0.65f, 1, 4, 1);
+
             _ = new Conversion(UOsnow_ingot)
             {
                 Input = "UOsnow_ore",
                 Piece = ConversionPiece.Smelter
             };
 
+            GameObject iceRockPrefab = PrefabManager.RegisterPrefab("uooresingots", "UOminerock_ice");
             Item UOice_ore = new Item("uooresingots", "UOice_ore");
             UOice_ore.Name.English("Ice Ore");
             UOice_ore.Description.English("A chunk of ice ore, frozen solid and sparkling with frost.");
@@ -160,6 +178,8 @@ namespace TestOresIngots
             UOice_ingot.Name.English("Ice Ingot");
             UOice_ingot.Description.English("An ingot of ice metal, emanating an intense cold.");
             UOice_ingot.Snapshot(); // I don't have an icon for this item in my asset bundle, so I will let the ItemManager generate one automatically
+
+            CustomMineRockRegistry.Register(iceRockPrefab.name, "UOice_ore", 0.55f, 1, 3, 1);
 
             _ = new Conversion(UOice_ingot)
             {
