@@ -64,7 +64,7 @@ public class Localizer
 		convertConfigValue ??= val => val.ToString();
 		if (!PlaceholderProcessors.ContainsKey(key))
 		{
-			PlaceholderProcessors[key] = new Dictionary<string, Func<string>>();
+			PlaceholderProcessors[key] = new();
 		}
 		void UpdatePlaceholder()
 		{
@@ -109,7 +109,7 @@ public class Localizer
 	{
 		if (!localizationLanguage.Remove(__instance))
 		{
-			localizationObjects.Add(new WeakReference<Localization>(__instance));
+			localizationObjects.Add(new(__instance));
 		}
 		localizationLanguage.Add(__instance, language);
 
@@ -158,7 +158,7 @@ public class Localizer
 
 		if (localizationData is not null)
 		{
-			foreach (KeyValuePair<string, string> kv in new DeserializerBuilder().IgnoreFields().Build().Deserialize<Dictionary<string, string>?>(localizationData) ?? new Dictionary<string, string>())
+			foreach (KeyValuePair<string, string> kv in new DeserializerBuilder().IgnoreFields().Build().Deserialize<Dictionary<string, string>?>(localizationData) ?? new())
 			{
 				localizationTexts[kv.Key] = kv.Value;
 			}
